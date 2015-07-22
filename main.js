@@ -1,13 +1,14 @@
-function Rect(x, y, width, height) {
+function Rect(x, y, width, height, color) {
     var MOVEMENT_INCREMENT = 5;
 
     this.x = x || 0;
     this.y = y || 0;
     this.width = width || 50;
     this.height = height || 50;
+    this.color = color || '#000';
 
     this.draw = function draw(canvasContext) {
-        console.log(this);
+        canvasContext.fillStyle = this.color;
         canvasContext.fillRect(this.x, this.y, this.width, this.height);
     };
 
@@ -35,13 +36,20 @@ function Rect(x, y, width, height) {
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
 
-    context.fillStyle = 'rgb(255, 0, 0)';
+    var drawables = [
+        new Rect(0, 0, 50, 50, '#ff0000'),
+        new Rect(canvas.width - 50, canvas.height - 50, 50, 50, '#0000ff')
+    ];
 
-    var rect = new Rect();
-    window.addEventListener('keydown', rect.keydownHandler.bind(rect));
+    drawables.forEach(function(drawable) {
+        window.addEventListener('keydown', drawable.keydownHandler.bind(drawable));
+    });
 
     setInterval(function() {
         context.clearRect(0, 0, canvas.width, canvas.height);
-        rect.draw(context);
+
+        drawables.forEach(function(drawable) {
+            drawable.draw(context);
+        });
     }, 1000 / FPS);
 })();
