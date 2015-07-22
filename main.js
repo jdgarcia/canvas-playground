@@ -10,6 +10,8 @@ var KeyCodes = {
     W: 87
 }
 
+var PressedKeyMap = {};
+
 var MovementKeys = {
     ARROWS: {
         UP: KeyCodes.UP,
@@ -42,21 +44,17 @@ function Rect(x, y, width, height, color, movementKeys) {
     };
 
     this.keydownHandler = function keydownHandler(event) {
-        console.log(event.keyCode);
-        console.log(this.movementKeys);
-        switch (event.keyCode) {
-            case this.movementKeys.LEFT:
-                this.x -= MOVEMENT_INCREMENT;
-                break;
-            case this.movementKeys.UP:
-                this.y -= MOVEMENT_INCREMENT;
-                break;
-            case this.movementKeys.RIGHT:
-                this.x += MOVEMENT_INCREMENT;
-                break;
-            case this.movementKeys.DOWN:
-                this.y += MOVEMENT_INCREMENT;
-                break;
+        if (PressedKeyMap[this.movementKeys.UP]) {
+            this.y -= MOVEMENT_INCREMENT;
+        }
+        if (PressedKeyMap[this.movementKeys.DOWN]) {
+            this.y += MOVEMENT_INCREMENT;
+        }
+        if (PressedKeyMap[this.movementKeys.LEFT]) {
+            this.x -= MOVEMENT_INCREMENT;
+        }
+        if (PressedKeyMap[this.movementKeys.RIGHT]) {
+            this.x += MOVEMENT_INCREMENT;
         }
     };
 }
@@ -72,10 +70,20 @@ function Rect(x, y, width, height, color, movementKeys) {
         new Rect(canvas.width - 50, canvas.height - 50, 50, 50, '#0000ff', MovementKeys.ARROWS)
     ];
 
+    // setup listeners for keeping track of pressed keys
+    window.addEventListener('keydown', function(event) {
+        PressedKeyMap[event.keyCode] = true;
+    });
+    window.addEventListener('keyup', function(event) {
+        PressedKeyMap[event.keyCode] = false;
+    });
+
+    // setup each drawable's key listener
     drawables.forEach(function(drawable) {
         window.addEventListener('keydown', drawable.keydownHandler.bind(drawable));
     });
 
+    // main game loop
     setInterval(function() {
         context.clearRect(0, 0, canvas.width, canvas.height);
 
